@@ -7,17 +7,18 @@ interface LightMarkerProps {
 }
 
 export default function LightMarker({ light }: LightMarkerProps) {
-    const color = light.isOn ? "#00f0ff" : "#ff003c";
+    const color = light.isOn ? "#00ff41" : "#ff003c";
 
     return (
         <CircleMarker
             center={[light.lat, light.lng]}
-            radius={6}
+            radius={8}
             pathOptions={{
                 color: color,
                 fillColor: color,
-                fillOpacity: light.isOn ? 0.8 : 0.4,
-                weight: 2
+                fillOpacity: light.isOn ? 0.9 : 0.4,
+                weight: 3,
+                className: light.isOn ? 'light-marker-glow' : ''
             }}
         >
             <Popup className="aviation-popup">

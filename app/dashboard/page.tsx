@@ -4,8 +4,11 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import dynamic from "next/dynamic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, AlertTriangle, CheckCircle2, Lightbulb } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Activity, AlertTriangle, CheckCircle2, Settings2, Download, Clock } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
+import Link from "next/link";
+import * as XLSX from "xlsx";
 
 // Dynamically import Map to avoid SSR issues with Leaflet
 const Map = dynamic(() => import("@/components/Map"), {
@@ -29,33 +32,90 @@ export default function DashboardPage() {
 
     const failedLights = lights?.filter(l => !l.isOn) || [];
 
+    // Calculate uptime percentage
+    const uptime = stats?.health || 0;
+
+    // Export to Excel function
+    const exportToExcel = () => {
+        if (!failedLights.length) {
+            alert("No failed lights to export");
+            return;
+        }
+
+        const data = failedLights.map(light => ({
+            Label: light.label,
+            Zone: light.zone,
+            Latitude: light.lat.toFixed(6),
+            Longitude: light.lng.toFixed(6),
+            Status: "Offline"
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Failed Lights");
+        XLSX.writeFile(workbook, `failed-lights-${new Date().toISOString().split('T')[0]}.xlsx`);
+    };
+
     return (
         <div className="flex h-screen bg-[#0a0a0f] text-foreground overflow-hidden">
             {/* Sidebar */}
             <aside className="w-80 border-r border-white/10 bg-[#141419] flex flex-col">
                 <div className="p-6 border-b border-white/10">
-                    <h1 className="text-2xl font-bold tracking-wider text-[var(--color-aviation-cyan)] flex items-center gap-2">
-                        <Activity className="h-6 w-6" />
-                        LUMAS
-                    </h1>
-                    <p className="text-xs text-muted-foreground mt-1 tracking-widest uppercase">Runway Light Control</p>
+                    <div className="flex items-center justify-between mb-2">
+                        <h1 className="text-2xl font-bold tracking-wider text-[var(--color-aviation-green)] flex items-center gap-2">
+                            <Activity className="h-6 w-6" />
+                            LUMAS
+                        </h1>
+                        <Link href="/simulation">
+                            <Button variant="outline" size="icon" title="Open Simulation">
+                                <Settings2 className="h-4 w-4" />
+                            </Button>
+                        </Link>
+                    </div>
+                    <p className="text-xs text-muted-foreground tracking-widest uppercase">Runway Light Control</p>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                    {/* Quick Actions */}
+                    <div className="space-y-2">
+                        <Button
+                            onClick={exportToExcel}
+                            variant="outline"
+                            className="w-full gap-2 border-[var(--color-aviation-green)]/30 hover:bg-[var(--color-aviation-green)]/10"
+                            disabled={!failedLights.length}
+                        >
+                            <Download className="h-4 w-4" />
+                            Export Failed Lights
+                        </Button>
+                    </div>
+
                     {/* System Health */}
                     <div className="space-y-4">
                         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">System Status</h2>
                         <div className="grid grid-cols-2 gap-4">
                             <Card className="bg-white/5 border-white/10">
                                 <CardContent className="p-4 flex flex-col items-center justify-center">
-                                    <span className="text-3xl font-bold text-[var(--color-aviation-cyan)]">{stats?.total || 0}</span>
+                                    <span className="text-3xl font-bold text-[var(--color-aviation-green)]">{stats?.total || 0}</span>
                                     <span className="text-xs text-muted-foreground uppercase mt-1">Total Units</span>
                                 </CardContent>
                             </Card>
                             <Card className="bg-white/5 border-white/10">
                                 <CardContent className="p-4 flex flex-col items-center justify-center">
-                                    <span className="text-3xl font-bold text-[var(--color-aviation-cyan)]">{stats?.health || 0}%</span>
+                                    <span className="text-3xl font-bold text-[var(--color-aviation-green)]">{stats?.health || 0}%</span>
                                     <span className="text-xs text-muted-foreground uppercase mt-1">Health</span>
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        {/* Additional Statistics */}
+                        <div className="grid grid-cols-1 gap-4">
+                            <Card className="bg-white/5 border-white/10">
+                                <CardContent className="p-4 flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <Clock className="h-4 w-4 text-muted-foreground" />
+                                        <span className="text-sm text-muted-foreground">Uptime</span>
+                                    </div>
+                                    <span className="text-lg font-bold text-[var(--color-aviation-green)]">{uptime}%</span>
                                 </CardContent>
                             </Card>
                         </div>
@@ -124,7 +184,7 @@ export default function DashboardPage() {
                 <div className="absolute bottom-4 right-4 z-[1000] bg-[#141419]/90 backdrop-blur border border-white/10 p-2 rounded-md shadow-xl">
                     <div className="flex items-center gap-4 text-xs font-mono">
                         <div className="flex items-center gap-2">
-                            <span className="h-2 w-2 rounded-full bg-[var(--color-aviation-cyan)] shadow-[0_0_8px_var(--color-aviation-cyan)]"></span>
+                            <span className="h-2 w-2 rounded-full bg-[var(--color-aviation-green)] shadow-[0_0_8px_var(--color-aviation-green)]"></span>
                             <span>OPERATIONAL</span>
                         </div>
                         <div className="flex items-center gap-2">

@@ -4,7 +4,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Lightbulb, ArrowLeft, RefreshCw } from "lucide-react";
+import { Lightbulb, LayoutDashboard, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -32,12 +32,12 @@ export default function SimulationPage() {
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-4">
                         <Link href="/dashboard">
-                            <Button variant="outline" size="icon">
-                                <ArrowLeft className="h-4 w-4" />
+                            <Button variant="outline" size="icon" title="Back to Dashboard">
+                                <LayoutDashboard className="h-4 w-4" />
                             </Button>
                         </Link>
                         <div>
-                            <h1 className="text-3xl font-bold tracking-wider text-[var(--color-aviation-cyan)]">
+                            <h1 className="text-3xl font-bold tracking-wider text-[var(--color-aviation-green)]">
                                 LIGHT SIMULATION
                             </h1>
                             <p className="text-muted-foreground">Manual override control panel</p>
@@ -53,7 +53,7 @@ export default function SimulationPage() {
                 {zones && Object.entries(zones).map(([zone, zoneLights]) => (
                     <Card key={zone} className="bg-[#141419] border-white/10">
                         <CardHeader>
-                            <CardTitle className="text-[var(--color-aviation-cyan)] tracking-widest uppercase text-sm">
+                            <CardTitle className="text-[var(--color-aviation-green)] tracking-widest uppercase text-sm">
                                 {zone}
                             </CardTitle>
                         </CardHeader>
@@ -66,7 +66,7 @@ export default function SimulationPage() {
                                         className={cn(
                                             "h-24 flex flex-col gap-2 transition-all duration-300",
                                             light.isOn
-                                                ? "border-[var(--color-aviation-cyan)] bg-[var(--color-aviation-cyan)]/10 hover:bg-[var(--color-aviation-cyan)]/20"
+                                                ? "border-[var(--color-aviation-green)] bg-[var(--color-aviation-green)]/10 hover:bg-[var(--color-aviation-green)]/20"
                                                 : "border-white/10 hover:border-white/20 opacity-50"
                                         )}
                                         onClick={() => toggleLight({ id: light._id })}
@@ -74,7 +74,7 @@ export default function SimulationPage() {
                                         <Lightbulb
                                             className={cn(
                                                 "h-8 w-8 transition-all duration-300",
-                                                light.isOn ? "text-[var(--color-aviation-cyan)] drop-shadow-[0_0_8px_rgba(0,240,255,0.8)]" : "text-muted-foreground"
+                                                light.isOn ? "text-[var(--color-aviation-green)] drop-shadow-[0_0_8px_rgba(0,255,65,0.8)]" : "text-muted-foreground"
                                             )}
                                         />
                                         <div className="flex flex-col items-center">
