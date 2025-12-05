@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "leaflet/dist/leaflet.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -41,6 +42,12 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  
+  /* Aviation Theme Colors */
+  --color-aviation-cyan: #00f0ff;
+  --color-aviation-red: #ff003c;
+  --color-aviation-dark: #0a0a0f;
+  --color-aviation-panel: #141419;
 }
 
 :root {
