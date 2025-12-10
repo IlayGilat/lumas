@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Lumas - Runway Lights Management",
-  description: "Automated lights dashboard system for airways runway",
+  title: "LUMAS - בקרת תאורת מסלול",
+  description: "מערכת ניהול תאורה אוטומטית למסלולי טיסה",
 };
 
 export default function RootLayout({
@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="he" dir="rtl" className="light">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
