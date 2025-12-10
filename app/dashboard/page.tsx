@@ -15,6 +15,8 @@ import {
   Clock,
   Menu,
   X,
+  Edit,
+  Save,
 } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 import Link from "next/link";
@@ -25,13 +27,14 @@ const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
   loading: () => (
     <div className="h-full w-full bg-muted animate-pulse flex items-center justify-center text-muted-foreground">
-      Loading Map System...
+      טוען מערכת מפה...
     </div>
   ),
 });
 
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isEditorMode, setIsEditorMode] = useState(false);
   const stats = useQuery(api.lights.getStats);
   const lights = useQuery(api.lights.list);
 
@@ -56,7 +59,7 @@ export default function DashboardPage() {
   // Export to Excel function
   const exportToExcel = () => {
     if (!failedLights.length) {
-      alert("No failed lights to export");
+      alert("אין נורות תקולות לייצוא");
       return;
     }
 
@@ -78,14 +81,14 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex h-screen bg-[#0a0a0f] text-foreground overflow-hidden">
+    <div className="flex h-screen bg-background text-foreground overflow-hidden">
       {/* Mobile Menu Button - Only visible on mobile */}
       <button
         onClick={() => setSidebarOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-[1001] bg-[#141419] border border-white/10 p-3 rounded-lg shadow-xl"
-        aria-label="Open menu"
+        className="md:hidden fixed top-4 right-4 z-[1001] bg-sidebar border border-sidebar-border p-3 rounded-lg shadow-xl"
+        aria-label="פתח תפריט"
       >
-        <Menu className="h-6 w-6 text-[var(--color-aviation-green)]" />
+        <Menu className="h-6 w-6 text-primary" />
       </button>
 
       {/* Mobile Overlay - Only visible when sidebar is open on mobile */}
@@ -101,15 +104,15 @@ export default function DashboardPage() {
         className={`
         fixed md:relative inset-0 md:inset-auto
         w-full md:w-80
-        border-r border-white/10 bg-[#141419] flex flex-col
+        border-l border-sidebar-border bg-sidebar flex flex-col
         z-[1002] md:z-auto
         transition-transform duration-300 ease-in-out
-        ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+        ${sidebarOpen ? "translate-x-0" : "translate-x-full md:translate-x-0"}
       `}
       >
-        <div className="p-6 border-b border-white/10">
+        <div className="p-6 border-b border-sidebar-border">
           <div className="flex items-center justify-between mb-2">
-            <h1 className="text-2xl font-bold tracking-wider text-[var(--color-aviation-green)] flex items-center gap-2">
+            <h1 className="text-2xl font-bold tracking-wider text-primary flex items-center gap-2">
               <Activity className="h-6 w-6" />
               LUMAS
             </h1>
@@ -120,19 +123,41 @@ export default function DashboardPage() {
                 size="icon"
                 className="md:hidden"
                 onClick={() => setSidebarOpen(false)}
-                title="Close menu"
+                title="סגור תפריט"
               >
                 <X className="h-4 w-4" />
               </Button>
+              <Button
+                variant={isEditorMode ? "default" : "outline"}
+                size="icon"
+                title={isEditorMode ? "Sass עריכה" : "מצב עריכה"}
+                onClick={() => setIsEditorMode(!isEditorMode)}
+                className={
+                  isEditorMode
+                    ? "bg-amber-500 hover:bg-amber-600 border-amber-500"
+                    : ""
+                }
+              >
+                {isEditorMode ? (
+                  <Save className="h-4 w-4" />
+                ) : (
+                  <Edit className="h-4 w-4" />
+                )}
+              </Button>
               <Link href="/simulation">
-                <Button variant="outline" size="icon" title="Open Simulation">
+                <Button variant="outline" size="icon" title="פתח סימולציה">
                   <Settings2 className="h-4 w-4" />
                 </Button>
               </Link>
             </div>
           </div>
           <p className="text-xs text-muted-foreground tracking-widest uppercase">
-            Runway Light Control
+            בקרת תאורת מסלול{" "}
+            {isEditorMode && (
+              <span className="text-amber-500 font-bold ml-2">
+                -- מצב עריכה --
+              </span>
+            )}
           </p>
         </div>
 
@@ -142,37 +167,37 @@ export default function DashboardPage() {
             <Button
               onClick={exportToExcel}
               variant="outline"
-              className="w-full gap-2 border-[var(--color-aviation-green)]/30 hover:bg-[var(--color-aviation-green)]/10"
+              className="w-full gap-2 border-primary/30 hover:bg-primary/10"
               disabled={!failedLights.length}
             >
               <Download className="h-4 w-4" />
-              Export Failed Lights
+              ייצא נורות תקולות
             </Button>
           </div>
 
           {/* System Health */}
           <div className="space-y-4">
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-              System Status
+              סטטוס מערכת
             </h2>
             <div className="grid grid-cols-2 gap-4">
-              <Card className="bg-white/5 border-white/10">
+              <Card className="bg-card border-border">
                 <CardContent className="p-4 flex flex-col items-center justify-center">
-                  <span className="text-3xl font-bold text-[var(--color-aviation-green)]">
+                  <span className="text-3xl font-bold text-primary">
                     {stats?.total || 0}
                   </span>
                   <span className="text-xs text-muted-foreground uppercase mt-1">
-                    Total Units
+                    סה״כ יחידות
                   </span>
                 </CardContent>
               </Card>
-              <Card className="bg-white/5 border-white/10">
+              <Card className="bg-card border-border">
                 <CardContent className="p-4 flex flex-col items-center justify-center">
-                  <span className="text-3xl font-bold text-[var(--color-aviation-green)]">
+                  <span className="text-3xl font-bold text-primary">
                     {stats?.health || 0}%
                   </span>
                   <span className="text-xs text-muted-foreground uppercase mt-1">
-                    Health
+                    בריאות
                   </span>
                 </CardContent>
               </Card>
@@ -180,15 +205,15 @@ export default function DashboardPage() {
 
             {/* Additional Statistics */}
             <div className="grid grid-cols-1 gap-4">
-              <Card className="bg-white/5 border-white/10">
+              <Card className="bg-card border-border">
                 <CardContent className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm text-muted-foreground">
-                      Uptime
+                      זמן פעילות
                     </span>
                   </div>
-                  <span className="text-lg font-bold text-[var(--color-aviation-green)]">
+                  <span className="text-lg font-bold text-primary">
                     {uptime}%
                   </span>
                 </CardContent>
@@ -203,7 +228,7 @@ export default function DashboardPage() {
                     {stats?.operational || 0}
                   </span>
                   <span className="text-xs text-muted-foreground uppercase">
-                    Active
+                    פעיל
                   </span>
                 </CardContent>
               </Card>
@@ -214,7 +239,7 @@ export default function DashboardPage() {
                     {stats?.failed || 0}
                   </span>
                   <span className="text-xs text-muted-foreground uppercase">
-                    Failed
+                    נכשל
                   </span>
                 </CardContent>
               </Card>
@@ -225,7 +250,7 @@ export default function DashboardPage() {
           {failedLights.length > 0 && (
             <div className="space-y-3">
               <h2 className="text-sm font-semibold text-red-500 uppercase tracking-wider flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4" /> Critical Alerts
+                <AlertTriangle className="h-4 w-4" /> התראות קריטיות
               </h2>
               {failedLights.map((light) => (
                 <div
@@ -245,23 +270,24 @@ export default function DashboardPage() {
           {/* Zone Status */}
           <div className="space-y-3">
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-              Zone Status
+              סטטוס אזור
             </h2>
             {zones &&
               Object.entries(zones).map(([zone, data]) => (
                 <div
                   key={zone}
-                  className="bg-white/5 border border-white/10 p-3 rounded-md"
+                  className="bg-card border border-border p-3 rounded-md"
                 >
                   <div className="flex justify-between items-center mb-2">
                     <span className="font-medium text-sm">{zone}</span>
                     <span
+                      dir="ltr"
                       className={`text-xs font-mono ${data.operational === data.total ? "text-green-500" : "text-yellow-500"}`}
                     >
                       {data.operational}/{data.total}
                     </span>
                   </div>
-                  <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
+                  <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
                     <div
                       className={`h-full ${data.operational === data.total ? "bg-green-500" : "bg-yellow-500"}`}
                       style={{
@@ -275,21 +301,20 @@ export default function DashboardPage() {
         </div>
       </aside>
 
-      {/* Main Map Area */}
       <main className="flex-1 relative">
-        <div className="absolute bottom-4 right-4 z-[1000] bg-[#141419]/90 backdrop-blur border border-white/10 p-2 rounded-md shadow-xl">
+        <div className="absolute bottom-4 left-4 z-[1000] bg-sidebar/90 backdrop-blur border border-sidebar-border p-2 rounded-md shadow-xl">
           <div className="flex items-center gap-4 text-xs font-mono">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-[var(--color-aviation-green)] shadow-[0_0_8px_var(--color-aviation-green)]"></span>
-              <span>OPERATIONAL</span>
+              <span>מבצעי</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-[var(--color-aviation-red)]"></span>
-              <span>OFFLINE</span>
+              <span>לא מקוון</span>
             </div>
           </div>
         </div>
-        <Map />
+        <Map isEditorMode={isEditorMode} />
       </main>
     </div>
   );
