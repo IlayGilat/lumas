@@ -15,6 +15,8 @@ import {
   Clock,
   Menu,
   X,
+  Edit,
+  Save,
 } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 import Link from "next/link";
@@ -32,6 +34,7 @@ const Map = dynamic(() => import("@/components/Map"), {
 
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isEditorMode, setIsEditorMode] = useState(false);
   const stats = useQuery(api.lights.getStats);
   const lights = useQuery(api.lights.list);
 
@@ -124,6 +127,23 @@ export default function DashboardPage() {
               >
                 <X className="h-4 w-4" />
               </Button>
+              <Button
+                variant={isEditorMode ? "default" : "outline"}
+                size="icon"
+                title={isEditorMode ? "Sass עריכה" : "מצב עריכה"}
+                onClick={() => setIsEditorMode(!isEditorMode)}
+                className={
+                  isEditorMode
+                    ? "bg-amber-500 hover:bg-amber-600 border-amber-500"
+                    : ""
+                }
+              >
+                {isEditorMode ? (
+                  <Save className="h-4 w-4" />
+                ) : (
+                  <Edit className="h-4 w-4" />
+                )}
+              </Button>
               <Link href="/simulation">
                 <Button variant="outline" size="icon" title="פתח סימולציה">
                   <Settings2 className="h-4 w-4" />
@@ -132,7 +152,12 @@ export default function DashboardPage() {
             </div>
           </div>
           <p className="text-xs text-muted-foreground tracking-widest uppercase">
-            בקרת תאורת מסלול
+            בקרת תאורת מסלול{" "}
+            {isEditorMode && (
+              <span className="text-amber-500 font-bold ml-2">
+                -- מצב עריכה --
+              </span>
+            )}
           </p>
         </div>
 
@@ -289,7 +314,7 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-        <Map />
+        <Map isEditorMode={isEditorMode} />
       </main>
     </div>
   );
