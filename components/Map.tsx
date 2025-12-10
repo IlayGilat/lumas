@@ -18,11 +18,24 @@ import { useEffect, useState } from "react";
 
 const { BaseLayer } = LayersControl;
 
+const ZONES = [
+  "Runway 12-30",
+  "Runway 08-26",
+  "Taxiway Alpha",
+  "Taxiway Bravo",
+  "Apron A",
+  "Apron B",
+];
+
 interface MapProps {
   isEditorMode?: boolean;
+  isQuickAddMode?: boolean;
 }
 
-export default function Map({ isEditorMode = false }: MapProps) {
+export default function Map({
+  isEditorMode = false,
+  isQuickAddMode = false,
+}: MapProps) {
   const lights = useQuery(api.lights.list);
   const createLight = useMutation(api.lights.create);
   const [isMounted, setIsMounted] = useState(false);
@@ -36,8 +49,21 @@ export default function Map({ isEditorMode = false }: MapProps) {
     useMapEvents({
       click(e) {
         if (isEditorMode) {
-          setNewLightLocation({ lat: e.latlng.lat, lng: e.latlng.lng });
-          setIsModalOpen(true);
+          if (isQuickAddMode) {
+            // Quick Add Logic
+            const randomZone = ZONES[Math.floor(Math.random() * ZONES.length)];
+            const randomId = Math.floor(10000 + Math.random() * 90000);
+            createLight({
+              lat: e.latlng.lat,
+              lng: e.latlng.lng,
+              label: `Quick-${randomId}`,
+              zone: randomZone,
+            });
+          } else {
+            // Default: Open Modal
+            setNewLightLocation({ lat: e.latlng.lat, lng: e.latlng.lng });
+            setIsModalOpen(true);
+          }
         }
       },
     });

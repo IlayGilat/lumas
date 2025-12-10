@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import dynamic from "next/dynamic";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Activity,
@@ -17,6 +17,7 @@ import {
   X,
   Edit,
   Save,
+  Zap,
 } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 import Link from "next/link";
@@ -35,6 +36,7 @@ const Map = dynamic(() => import("@/components/Map"), {
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isEditorMode, setIsEditorMode] = useState(false);
+  const [isQuickAddMode, setIsQuickAddMode] = useState(false);
   const stats = useQuery(api.lights.getStats);
   const lights = useQuery(api.lights.list);
 
@@ -127,11 +129,29 @@ export default function DashboardPage() {
               >
                 <X className="h-4 w-4" />
               </Button>
+              {isEditorMode && (
+                <Button
+                  variant={isQuickAddMode ? "default" : "outline"}
+                  size="icon"
+                  title={isQuickAddMode ? "ביטול הוספה מהירה" : "הוספה מהירה"}
+                  onClick={() => setIsQuickAddMode(!isQuickAddMode)}
+                  className={
+                    isQuickAddMode
+                      ? "bg-blue-500 hover:bg-blue-600 border-blue-500 text-white"
+                      : "text-blue-400 hover:text-blue-500 border-blue-500/30"
+                  }
+                >
+                  <Zap className="h-4 w-4 fill-current" />
+                </Button>
+              )}
               <Button
                 variant={isEditorMode ? "default" : "outline"}
                 size="icon"
                 title={isEditorMode ? "Sass עריכה" : "מצב עריכה"}
-                onClick={() => setIsEditorMode(!isEditorMode)}
+                onClick={() => {
+                  setIsEditorMode(!isEditorMode);
+                  if (isEditorMode) setIsQuickAddMode(false); // Turn off quick add when exiting editor mode
+                }}
                 className={
                   isEditorMode
                     ? "bg-amber-500 hover:bg-amber-600 border-amber-500"
@@ -314,7 +334,7 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-        <Map isEditorMode={isEditorMode} />
+        <Map isEditorMode={isEditorMode} isQuickAddMode={isQuickAddMode} />
       </main>
     </div>
   );
